@@ -16,17 +16,17 @@ using namespace vex;
 vex::brain Brain;
 
 // Convert boolean to direction - forward is true
-directionType fwdBack(bool dir) { return dir ? forward : reverse; }
+directionType fwdBack(double speed) { return (speed > 0 ? directionType::fwd : directionType::rev); }
 
 // define your global instances of motors and other devices here
 int main() {
     controller control;
 
-    motor m1(1);
-    motor m2(2);
-    motor m3(3);
+    motor m1(PORT11);
+    motor m2(PORT12);
+    motor m3(PORT13);
 
-    Vec2D motor1Dir(0, 1);
+    Vec2D motor1Dir(-1, 0);
     Vec2D motor2Dir = motor1Dir.rotate(2 * M_PI / 3);
     Vec2D motor3Dir = motor2Dir.rotate(2 * M_PI / 3);
 
@@ -45,21 +45,23 @@ int main() {
         m2Power += spin;
         m3Power += spin;
 
-        Brain.Screen.printAt(10, 50, "%.2f,%.2f,%.2f     ", m1Power, m2Power, m3Power);
+        // Brain.Screen.printAt(10, 30, "%.2f,%.2f        ", motor2Dir.x, motor2Dir.y);
+        // Brain.Screen.printAt(10, 60, "%.2f,%.2f        ", motor3Dir.x, motor3Dir.y);
+        Brain.Screen.printAt(10, 60, "%.2f,%.2f,%.2f     ", m1Power, m2Power, m3Power);
         double maxPower = fmax(fmax(fabs(m1Power), fabs(m2Power)), fabs(m3Power));
         if (maxPower > 100) {
-            m1Power * 100 / maxPower;
-            m2Power * 100 / maxPower;
-            m3Power * 100 / maxPower;
+            m1Power *= 100 / maxPower;
+            m2Power *= 100 / maxPower;
+            m3Power *= 100 / maxPower;
         }
-        Brain.Screen.printAt(10, 80, "%.2f,%.2f,%.2f     ", m1Power, m2Power, m3Power);
-        
+        Brain.Screen.printAt(10, 90, "%.2f,%.2f,%.2f     ", m1Power, m2Power, m3Power);
+
         // double angle = atan2(joystickY, joystickX);
         // double speedVector = sqrt(joystickY + joystickY);
         // calculate motor powers
 
-        // m1.spin(fwdBack(m1Power), fabs(m1Power), velocityUnits::pct);
-        // m2.spin(fwdBack(m2Power), fabs(m2Power), velocityUnits::pct);
-        // m3.spin(fwdBack(m3Power), fabs(m3Power), velocityUnits::pct);
+        m1.spin(fwdBack(m1Power), fabs(m1Power), velocityUnits::pct);
+        m2.spin(fwdBack(m2Power), fabs(m2Power), velocityUnits::pct);
+        m3.spin(fwdBack(m3Power), fabs(m3Power), velocityUnits::pct);
     }
 }

@@ -3,7 +3,7 @@
 #include <string>
 
 Vec2D Vec2D::rotate(double angle) {
-    angle *= M_PI / 180;
+    // angle *= M_PI / 180;
     Vec2D rotated{x * cos(angle) - y * sin(angle), x * sin(angle) + y * cos(angle)};
     return rotated;
 }
